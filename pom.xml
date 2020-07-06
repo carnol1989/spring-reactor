@@ -89,14 +89,14 @@
 		</dependency>
 	</dependencies>
 
-	<!-- Repo necesaria para descargar swagger 3.0.0-SNAPSHOT -->
-	<repositories>
-		<repository>
-			<id>jcenter-snapshots</id>
-			<name>jcenter</name>
-			<url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
-		</repository>
-	</repositories>	
+	<!-- Repo necesaria para descargar swagger 3.0.0-SNAPSHOT (Pruebas) -> para el 2020 -->
+<!-- 	<repositories> -->
+<!-- 		<repository> -->
+<!-- 			<id>jcenter-snapshots</id> -->
+<!-- 			<name>jcenter</name> -->
+<!-- 			<url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url> -->
+<!-- 		</repository> -->
+<!-- 	</repositories>	 -->
 
 	<build>
 		<plugins>

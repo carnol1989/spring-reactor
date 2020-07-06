@@ -48,8 +48,8 @@ public class GlobalErrorExceptionHandler extends AbstractErrorWebExceptionHandle
 				httpStatus= HttpStatus.INTERNAL_SERVER_ERROR;
 				break;
 			default:
-				mapException.put("error", "500");
-				mapException.put("excepcion", "Error Interno");
+				mapException.put("error", "XYZ");
+				mapException.put("excepcion", "Otro error");
 				httpStatus= HttpStatus.BAD_REQUEST;
 				break;
 		}
