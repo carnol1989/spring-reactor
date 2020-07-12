@@ -10,17 +10,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.mitocode.document.Cliente;
-import com.mitocode.service.IClienteService;
+import com.mitocode.document.Factura;
+import com.mitocode.service.IFacturaService;
 import com.mitocode.validators.RequestValidator;
 
 import reactor.core.publisher.Mono;
 
 @Component
-public class ClienteHandler {
+public class FacturaHandler {
 
 	@Autowired
-	private IClienteService service;
+	private IFacturaService service;
 	
 	@Autowired
 	private RequestValidator validadorGeneral;
@@ -28,7 +28,7 @@ public class ClienteHandler {
 	public Mono<ServerResponse> listarHandler(ServerRequest req) {
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_STREAM_JSON)
-				.body(service.listarService(), Cliente.class);
+				.body(service.listarService(), Factura.class);
 	}
 	
 	public Mono<ServerResponse> listarPorIdHandler(ServerRequest req) {
@@ -43,16 +43,16 @@ public class ClienteHandler {
 	}
 	
 	public Mono<ServerResponse> registrarHandler(ServerRequest req) {
-		Mono<Cliente> ClienteMono = req.bodyToMono(Cliente.class);
-		return ClienteMono.flatMap(this.validadorGeneral::validar)
+		Mono<Factura> facturaMono = req.bodyToMono(Factura.class);
+		return facturaMono.flatMap(this.validadorGeneral::validar)
 				.flatMap(service::registrarService).flatMap(p -> ServerResponse.created(URI.create(req.uri().toString().concat("/").concat(p.getId())))
 				.contentType(MediaType.APPLICATION_STREAM_JSON)
 				.body(fromValue(p)));
 	}
 	
 	public Mono<ServerResponse> modificarHandler(ServerRequest req) {
-		Mono<Cliente> ClienteMono = req.bodyToMono(Cliente.class);
-		return ClienteMono.flatMap(this.validadorGeneral::validar)
+		Mono<Factura> facturaMono = req.bodyToMono(Factura.class);
+		return facturaMono.flatMap(this.validadorGeneral::validar)
 				.flatMap(service::modificarService)
 				.flatMap(p -> ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_STREAM_JSON)

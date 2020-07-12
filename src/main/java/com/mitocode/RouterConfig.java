@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.mitocode.handler.ClienteHandler;
+import com.mitocode.handler.FacturaHandler;
 import com.mitocode.handler.PlatoHandler;
 
 //Functional Endpoints
@@ -20,7 +21,7 @@ public class RouterConfig {
 
 	@Bean
 	public RouterFunction<ServerResponse> rutasPlatos(PlatoHandler platoHandler) {
-		return route(GET("/v2/platos"), platoHandler::listarHandler)
+		return route(GET("/v2/platos").or(GET("/v3/platos")), platoHandler::listarHandler)
 				.andRoute(GET("/v2/platos/{id}"), platoHandler::listarPorIdHandler)
 				.andRoute(POST("/v2/platos"), platoHandler::registrarHandler)
 				.andRoute(PUT("/v2/platos"), platoHandler::modificarHandler)
@@ -34,6 +35,15 @@ public class RouterConfig {
 				.andRoute(POST("/v2/clientes"), clienteHandler::registrarHandler)
 				.andRoute(PUT("/v2/clientes"), clienteHandler::modificarHandler)
 				.andRoute(DELETE("/v2/clientes/{id}"), clienteHandler::eliminarHandler);
+	}
+	
+	@Bean
+	public RouterFunction<ServerResponse> rutasFacturas(FacturaHandler facturaHandler) {
+		return route(GET("/v2/facturas"), facturaHandler::listarHandler)
+				.andRoute(GET("/v2/facturas/{id}"), facturaHandler::listarPorIdHandler)
+				.andRoute(POST("/v2/facturas"), facturaHandler::registrarHandler)
+				.andRoute(PUT("/v2/facturas"), facturaHandler::modificarHandler)
+				.andRoute(DELETE("/v2/facturas/{id}"), facturaHandler::eliminarHandler);
 	}
 	
 }

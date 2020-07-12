@@ -9,8 +9,6 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
@@ -25,43 +23,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mitocode.document.Plato;
-import com.mitocode.pagination.PageSupport;
-import com.mitocode.service.IPlatoService;
+import com.mitocode.document.Factura;
+import com.mitocode.service.IFacturaService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/platos")
-public class PlatoController {
+@RequestMapping("/facturas")
+public class FacturaController {
 
 	@Autowired
-	private IPlatoService service;
+	private IFacturaService service;
 	
 	/*@GetMapping
-	public Flux<Plato> listarController() {
+	public Flux<Factura> listarController() {
 		return service.listarService();
 	}*/
 	
 	@GetMapping
-	public Mono<ResponseEntity<Flux<Plato>>> listarController() {
-		Flux<Plato> platosFlux = service.listarService(); 
+	public Mono<ResponseEntity<Flux<Factura>>> listarController() {
+		Flux<Factura> facturasFlux = service.listarService(); 
 		return Mono.just(ResponseEntity.ok()
 				.contentType(MediaType.APPLICATION_STREAM_JSON)
-				.body(platosFlux));
+				.body(facturasFlux));
 	}
 	
 	/*@GetMapping("/{id}")
-	public Mono<Plato> listarPorIdController(@PathVariable("id") String id) {
+	public Mono<Factura> listarPorIdController(@PathVariable("id") String id) {
 		return service.listarPorIdService(id);
 	}*/
 	
 	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Plato>> listarPorIdController(@PathVariable("id") String id) {
+	public Mono<ResponseEntity<Factura>> listarPorIdController(@PathVariable("id") String id) {
 		return service.listarPorIdService(id)
 				.map(p -> ResponseEntity.ok()
 							.contentType(MediaType.APPLICATION_STREAM_JSON)
@@ -70,26 +66,35 @@ public class PlatoController {
 	}
 	
 	/*@PostMapping
-	public Mono<Plato> registrarController(@RequestBody Plato plato) {
-		return service.registrarService(plato);
+	public Mono<Factura> registrarController(@RequestBody Factura factura) {
+		return service.registrarService(factura);
+	}*/
+	
+	/*@PostMapping
+	public Mono<ResponseEntity<Factura>> registrarController(@Valid @RequestBody Factura factura, final ServerHttpRequest req) {
+		return service.registrarService(factura)
+				.map(p -> ResponseEntity.created(URI.create(req.getURI().toString().concat("/").concat(p.getId())))
+						.contentType(MediaType.APPLICATION_STREAM_JSON)
+						.build());
 	}*/
 	
 	@PostMapping
-	public Mono<ResponseEntity<Plato>> registrarController(@Valid @RequestBody Plato plato, final ServerHttpRequest req) {
-		return service.registrarService(plato)
-				.map(p -> ResponseEntity.created(URI.create(req.getURI().toString()/*.concat("/")*/.concat(p.getId())))
+	public Mono<ResponseEntity<Factura>> registrarController(@Valid @RequestBody Factura factura, final ServerHttpRequest req) {
+		return service.registrarService(factura)
+				.map(p -> ResponseEntity.created(URI.create(req.getURI().toString().concat("/").concat(p.getId())))
 						.contentType(MediaType.APPLICATION_STREAM_JSON)
-						.body(p));
+						.body(p))
+				.onErrorMap(error -> new ArithmeticException("ups"));
 	}
 	
 	/*@PutMapping
-	public Mono<Plato> modificarController(@RequestBody Plato plato) {
-		return service.modificarService(plato);
+	public Mono<Factura> modificarController(@RequestBody Factura factura) {
+		return service.modificarService(factura);
 	}*/
 	
 	@PutMapping
-	public Mono<ResponseEntity<Plato>> modificarController(@Valid @RequestBody Plato plato) {
-		return service.modificarService(plato)
+	public Mono<ResponseEntity<Factura>> modificarController(@Valid @RequestBody Factura factura) {
+		return service.modificarService(factura)
 				.map(p -> ResponseEntity.ok()
 						.contentType(MediaType.APPLICATION_STREAM_JSON)
 						.body(p))
@@ -110,21 +115,21 @@ public class PlatoController {
 				}).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 	
-	//private Plato platoHateoas;//para hacer el 1er método
+	//private Factura facturaHateoas;//para hacer el 1er método
 	//https://github.com/spring-projects/spring-hateoas/blob/a89e57eed7e12819b87be7f1b977dddfd432541d/src/test/java/org/springframework/hateoas/support/WebFluxEmployeeController.java#L101-L106
 	@GetMapping("/hateoas/{id}")
-	public Mono<EntityModel<Plato>> listarHateoasPorIdController(@PathVariable("id") String id) {
-		//platos/listar/1
-		Mono<Link> selfLink = linkTo(methodOn(PlatoController.class).listarHateoasPorIdController(id)).withSelfRel().toMono();
-		Mono<Link> selfLink2 = linkTo(methodOn(PlatoController.class).listarHateoasPorIdController(id)).withSelfRel().toMono();
+	public Mono<EntityModel<Factura>> listarHateoasPorIdController(@PathVariable("id") String id) {
+		//facturas/listar/1
+		Mono<Link> selfLink = linkTo(methodOn(FacturaController.class).listarHateoasPorIdController(id)).withSelfRel().toMono();
+		Mono<Link> selfLink2 = linkTo(methodOn(FacturaController.class).listarHateoasPorIdController(id)).withSelfRel().toMono();
 		
 		//PRACTICA FACIL
 		//1er método
 		/*return service.listarPorIdService(id).flatMap(p -> {
-			this.platoHateoas = p;
+			this.facturaHateoas = p;
 			return selfLink;
 		}).map(links -> {
-			return new EntityModel<>(this.platoHateoas, links);
+			return new EntityModel<>(this.facturaHateoas, links);
 		});*/
 		
 		//PRACTICA INTERMEDIO
@@ -143,20 +148,6 @@ public class PlatoController {
 				.zipWith(service.listarPorIdService(id), (links, p) -> {
 					return new EntityModel<>(p, links);
 				});
-	}
-	
-	@GetMapping("/pageable")
-	public Mono<ResponseEntity<PageSupport<Plato>>> listarPageableController(
-			@RequestParam(name = "page", defaultValue = "0") int page, 
-			@RequestParam(name = "size", defaultValue = "10") int size) {
-		
-		Pageable pageRequest = PageRequest.of(page, size);
-		
-		return service.listarPageService(pageRequest)
-				.map(p -> ResponseEntity.ok()
-						.contentType(MediaType.APPLICATION_STREAM_JSON)
-						.body(p))
-				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 	
 }
