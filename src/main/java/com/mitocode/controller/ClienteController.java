@@ -4,17 +4,21 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.lin
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 import static reactor.function.TupleUtils.function;
 
+import java.io.File;
 import java.net.URI;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mitocode.document.Cliente;
@@ -37,6 +42,9 @@ public class ClienteController {
 
 	@Autowired
 	private IClienteService service;
+	
+	@Value("${ruta.subida}")
+	private String RUTA_SUBIDA;
 	
 	/*@GetMapping
 	public Flux<Cliente> listarController() {
@@ -139,6 +147,16 @@ public class ClienteController {
 				.zipWith(service.listarPorIdService(id), (links, p) -> {
 					return new EntityModel<>(p, links);
 				});
+	}
+	
+	@PostMapping("subir/{id}")
+	public Mono<ResponseEntity<Cliente>> subirController(@PathVariable String id, @RequestPart FilePart file) {
+		return service.listarPorIdService(id)
+				.flatMap(c -> {
+					c.setUrlFoto(UUID.randomUUID().toString() + "-" + file.filename());
+					return file.transferTo(new File(RUTA_SUBIDA + c.getUrlFoto())).then(service.registrarService(c));
+				}).map(c -> ResponseEntity.ok().body(c))
+				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 	
 }
